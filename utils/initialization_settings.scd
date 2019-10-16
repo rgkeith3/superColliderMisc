@@ -24,6 +24,11 @@ s.options.numInputBusChannels_(~numChannels);
 s.options.memSize_(2.pow(20))
 )
 
+(
+// regular I/O
+s.options.memSize_(2.pow(20))
+)
+
 // load samples
 (
 var sampleFolder;
@@ -38,7 +43,7 @@ readFiles = {
 	var fileArray = [];
 	files.do({
 		|file|
-		var buf = Buffer.read(s, file.fullPath);
+		var buf = Buffer.readChannel(s, file.fullPath, channels: 1);
 		fileArray = fileArray ++ [buf];
 	});
 	fileArray;
@@ -64,4 +69,5 @@ sampleFolder.entries.do({ |entry|
 	recurseFolder.value(entry, ~samples)
 });
 )
+
 
