@@ -1,218 +1,123 @@
-// SynthDefs
-
-// buffer players
 (
-// oneshots
-var oneShot = {|buf, rate=1, start=0, atk=0, hold=1, rel=0, amp=1|
-	var env, bufDur;
-	bufDur = BufDur.kr(buf) * rate.reciprocal;
-	env = EnvGen.ar(Env([0, 1, 1, 0],[atk * bufDur, hold * bufDur, rel* bufDur]), doneAction: 2);
-	PlayBuf.ar(1, buf, BufRateScale.kr(buf) * rate, startPos: start * BufSamples.kr(buf), doneAction: 2) * env * amp;
+// n is numChannels
+var nPanFunc, outFunc, adsrFunc, percFunc, synthDefs;
+if (n == 2) {
+	nPanFunc = {|sig, pan=0| Pan2.ar(sig, pan)};
+} {
+	nPanFunc = {|sig, panX=0, panY=0| Pan4.ar(sig, panX, panY)};
 };
 
-SynthDef(\monoOneShot, {|out=0|
-	var sig = SynthDef.wrap(oneShot);
-	Out.ar(out, sig);
-}).add;
+outFunc = {|sig, out=0, amp=0.8| Out.ar(out, sig * amp)};
 
-SynthDef(\sterOneShot, {|out=0, panX=0|
-	var sig = SynthDef.wrap(oneShot);
-	sig = Pan2.ar(sig, panX);
-	Out.ar(out, sig);
-}).add;
 
-SynthDef(\quadOneShot, {|out=0, panX=0, panY=0|
-	var sig = SynthDef.wrap(oneShot);
-	sig = Pan4.ar(sig, panX, panY);
-	Out.ar(out, sig);
-}).add;
+adsrFunc = {|sig, atk=0.01, dec=0.1, sus=0.8, rel=0.5, gate=1| sig * EnvGen.ar(Env.adsr(atk, dec, sus, rel), gate, doneAction: 2)};
 
-SynthDef(\quadAZOneShot, {|out=0, panX=1, panY=1|
-	var sig = SynthDef.wrap(oneShot);
-	# w, x, y, z = PanAz.ar(4, sig, panX, width: panY);
-	Out.ar(0, [w, x, z, y])
-}).add;
+percFunc = {|sig, atk=0.01, rel=0.5| sig * EnvGen.ar(Env.perc(atk, rel), doneAction: 2)};
+
+synthDefs = (
+	oneShot: [
+		{|buf, rate=1, start=0| var startPos = start * BufFrames.ir(buf); PlayBuf.ar(1, buf, BufRateScale.ir(buf)* rate, startPos: startPos, doneAction: 2)},
+		percFunc,
+		nPanFunc,
+		outFunc
+	],
+
+	stOneShot: [
+		{|buf, rate=1, start=0| var startPos = start * BufFrames.ir(buf); PlayBuf.ar(2, buf, BufRateScale.ir(buf)* rate, startPos: startPos, doneAction: 2)},
+		percFunc,
+		outFunc
+	],
+
+	loop: [
+		{|buf, rate=1, start=0| var startPos = start * BufFrames.ir(buf); PlayBuf.ar(1, buf, BufRateScale.ir(buf)* rate, startPos: startPos, loop: 1)},
+		adsrFunc,
+		nPanFunc,
+		outFunc
+	],
+
+	stLoop: [
+		{|buf, rate=1, start=0| var startPos = start * BufFrames.ir(buf); PlayBuf.ar(2, buf, BufRateScale.ir(buf)* rate, startPos: startPos, loop: 1)},
+		adsrFunc,
+		outFunc
+	],
+
+	beatPlay: [
+		{|buf, clock=1, beats=4, start=0| var startPos, length, rate; startPos = start * BufFrames.ir(buf); length = clock.reciprocal * beats; rate = (BufDur.ir(buf) / length) * BufRateScale.ir(buf); PlayBuf.ar(1, buf, rate, startPos: startPos, doneAction: 2)},
+		adsrFunc,
+		nPanFunc,
+		outFunc
+	],
+
+	beatWarp: [
+		{|buf, clock=1, beats=4, start=0, freqScale=1, winSize=0.2, envBuf=(-1), overlaps=8, winRand=0| var length, pointer; length = clock.reciprocal * beats; pointer = Line.ar(dur: length, add: start); Warp1.ar(1, buf, pointer, freqScale, winSize, envBuf, overlaps, winRand);},
+		adsrFunc,
+		nPanFunc,
+		outFunc
+	],
+
+	stbeatWarp: [
+		{|buf, clock=1, beats=4, start=0, freqScale=1, winSize=0.2, envBuf=(-1), overlaps=8, winRand=0| var length, pointer; length = clock.reciprocal * beats; pointer = Line.ar(dur: length, add: start); Warp1.ar(2, buf, pointer, freqScale, winSize, envBuf, overlaps, winRand);},
+		adsrFunc,
+		outFunc
+	],
+
+	warp: [
+		{|buf, pointer=0.5, freqScale=1, winSize=0.2, envBuf=(-1), overlaps=8, winRand=0| Warp1.ar(1, buf, pointer, freqScale, winSize, envBuf, overlaps, winRand);},
+		adsrFunc,
+		nPanFunc,
+		outFunc
+	],
+
+	stWarp: [
+		{|buf, pointer=0.5, freqScale=1, winSize=0.2, envBuf=(-1), overlaps=8, winRand=0| Warp1.ar(2, buf, pointer, freqScale, winSize, envBuf, overlaps, winRand);},
+		adsrFunc,
+		outFunc
+	],
+
+	// maybe do something to give the pointer motion, like pointerdev?
+	bufGrain: [
+		{|buf, pRate=1, start=0, pDev=0.1, gRate=1, gSize=0.1, tRate=15, tDev=0.5, pan=0, pNoise=0.1, envBuf=(-1)|
+			var pointer = Sweep.kr(1, BufRateScale.kr(buf) * pRate) + WhiteNoise.kr(pDev) + start;
+			GrainBuf.ar(n, GaussTrig.ar(tRate, tDev), gSize, buf, gRate, pointer, pan: pan + WhiteNoise.kr(pNoise), envbufnum: envBuf);
+		},
+		adsrFunc,
+		outFunc
+	],
+
+	// maybe try a different filter? not quite the right sound and feels like it's to cpu intensive?
+	saw: [
+		{|freq=440, fFreq=880, q=1, fAmt=0.1, fSpd=0.1, pan=0, pAmt=0.1, pSpd=0.1|
+			Pan2.ar(RLPF.ar(SawDPW.ar(freq + LFNoise1.kr(fSpd, fAmt)), fFreq, q), pan + LFNoise1.kr(pSpd, pAmt));
+		},
+		adsrFunc,
+		outFunc
+	],
+
+	flutterSaw: [
+		{|freq=440, amt=1, rate=15, ffreq=880, q=1|
+			var flutter = LFClipNoise.kr(rate, amt/2, amt/2) * freq;
+			RLPF.ar(SawDPW.ar(freq + flutter), ffreq, q);
+		},
+		adsrFunc,
+		nPanFunc,
+		outFunc
+	],
+
+	// to do:
+	// super saw
+	// vosc
+	// some drums
+	// some bass
+);
+
+
+synthDefs.keysValuesDo {|synthName, synthFuncs|
+	SynthDef(synthName.asSymbol, {
+		var sig = SynthDef.wrap(synthFuncs[0]);
+		synthFuncs[1..].do {|func|
+			sig = SynthDef.wrap(func, prependArgs: [sig]);
+		};
+	}).add;
+}
+
 )
-
-(
-// granular buffer synths
-
-// define grain window envs here
-// not really sure why this isn't working
-// it wasn't working because buffers for grain buffers must be mono
-// maybe refactor this into different 'mono', 'ster', 'quad' versions
-
-SynthDef(\granOneShot, {|buf, grainRate=1, grainSize=1, densStart=1, densEnd=1, trigChaos=1, grainEnvBuf=(-1), spread=0, panX=0, atk=0, hold=1, rel=0, amp=1, out = 0|
-	var playLine, densLine, trig, sig, bufDur, panSig, env;
-	panSig = WhiteNoise.kr(spread, panX);
-	bufDur = BufDur.kr(buf) + (BufDur.kr(buf) * grainSize);
-	env = EnvGen.ar(Env([0, 1, 1, 0], [atk * bufDur, hold * bufDur, rel * bufDur]), doneAction: 2);
-	densLine = Line.kr(densStart, densEnd, bufDur);
-	trig = GaussTrig.kr(densLine, trigChaos);
-	# w, x, y, z = GrainBuf.ar(4, trig, grainSize * bufDur, buf, grainRate, 0,pan: panSig, envbufnum: grainEnvBuf) * env * amp;
-	Out.ar(out, [w, x, z, y]);
-}).add;
-)
-
-(
-
-var envWarpBuf = {|buf, clock=1, beats=1, gate=1, atk=0, decay=0, sus=1, rel=0, amp=1, pitchRatio=1, windowSize=0.2, windowRand=0, overlaps=8, envBuf=(-1)|
-	var env, pointer, beatDur;
-	beatDur = clock.reciprocal * beats;
-	env = EnvGen.ar(Env.adsr(atk * beatDur, decay* beatDur, sus, rel * beatDur), gate, doneAction: 2) * amp;
-	pointer = Line.ar(dur: beatDur);
-	Warp1.ar(1, buf, pointer, pitchRatio, windowSize, envBuf, overlaps, windowRand, 2) * env;
-};
-
-SynthDef(\monoBeatBufPlay, {|out=0|
-	var sig = SynthDef.wrap(envWarpBuf);
-	Out.ar(0, sig);
-}).add;
-
-SynthDef(\sterBeatBufPlay, {|out=0, panX=0|
-	var sig = SynthDef.wrap(envWarpBuf);
-	sig = Pan2.ar(sig, panX);
-	Out.ar(0, sig);
-}).add;
-
-SynthDef(\quadBeatBufPlay, {|out=0, panX=0, panY=0|
-	var sig = SynthDef.wrap(envWarpBuf);
-	sig = Pan4.ar(sig, panX, panY);
-	Out.ar(0, sig);
-}).add;
-
-SynthDef(\quadAzBeatBufPlay, {|out=0, panX=1, panY=1|
-	var sig = SynthDef.wrap(envWarpBuf);
-	sig = PanAz.ar(4, sig, panX, width: panY);
-	Out.ar(0, sig);
-}).add;
-)
-
-(
-Pbindef(\sterBeatBufPlay,
-	\instrument, \sterBeatBufPlay,
-	\buf, ~samples[\breaks][2],
-	\clock, Pdefn(\tempo),
-	\delta, Pseq([1/2, 1, 3/4, 1/4, 1/2, 1], inf),
-	\sustain, Pkey(\delta),
-	\beats, 4,
-	\panX, 0,
-	\windowSize, Pwrand([0.01, 0.1, 0.2, 0.5], [0.7, 0.2, 0.07, 0.03], inf),
-	\overlaps, 18,
-	\pitchRatio, Pstutter(6, Pseq([1, 1, 0.75, 1.5, 5], inf)),
-)
-)
-
-TempoClock.default.tempo_(140/60)
-
-(
-Pbindef(\sterBeatBufPlaySynths,
-	\instrument, \sterBeatBufPlay,
-	\buf, Prand(~samples[\Synths], inf),
-	\clock, Pdefn(\tempo),
-	\delta, Pseq([4, 4, 4, 2, 1, 1], inf),
-	\sustain, Pkey(\delta),
-	\beats, 2,
-	\amp, 0.1,
-	\panX, Pwhite(-1.0, 1.0),
-	\windowSize, 0.1,
-	\overlaps, Prand([2,4,8,16], inf),
-	\pitchRatio, 5
-)
-)
-
-Pbindef(\sterBeatBufPlaySynths).play
-
-(
-var tempo = 160/60;
-Pdefn(\tempo, tempo);
-TempoClock.default.tempo_(tempo)
-)
-
-
-
-(
-Pbindef(\testGranOneshot,
-	\instrument, \granOneShot,
-	\dur, 8,
-	\buf, Prand([~samples[\Drums][\Snares][0]], inf),
-	\amp, 0.4,
-	\spread, 1,
-	\grainRate, 1,
-	\grainSize, 0.1,
-	\densStart, 250,
-	\atk, 0,
-	\hold, 0,
-	\rel, 1,
-	\trigChaos, Pwhite()
-)
-)
-
-
-(
-Pbindef(\test,
-	\instrument, \sterOneShot,
-	\delta, Pseq([1/3, 2/3, 1, 1, 1], inf),
-	\buf, ~samples[\Drums][\Kicks][7],
-	\rate, 1,
-	\start, 0,
-	\atk, 0,
-	\hold, 1,
-	\rel, 0,
-	\amp, 10,
-	\panX, 0,
-	\panY, 0
-).play
-)
-
-StageLimiter.activate
-
-(
-Pbindef(\testSnare,
-	\instrument, \sterOneShot,
-	\delta, Pseq([2/3, Pwrand([4/3, Pseq(2/3!2, 2)], [0.8, 0.2])], inf),
-	\buf, ~samples[\Drums][\Snares][2],
-	\rate, Pwrand([1, 0.7], [0.8, 0.2], inf),
-	\start, 0,
-	\atk, 0,
-	\hold, 1,
-	\rel, 0,
-	\amp, 0.4,
-	\panX, Pwhite(-1.0, 1),
-	\panY, Pwhite(-1.0, 1)
-).play
-)
-
-(
-Pbindef(\testhat,
-	\instrument, \sterOneShot,
-	\delta, 1/4,
-	\buf, Prand(~samples[\Drums]['Closed Hihat'], inf),
-	\rate, Pwrand([1, 0.7], [0.8, 0.2], inf),
-	\start, 0,
-	\atk, 0,
-	\hold, 1,
-	\rel, 0,
-	\amp, 0.4,
-	\panX, Pwhite(-1.0, 1),
-	\panY, Pwhite(-1.0, 1)
-).play
-)
-
-(
-Pbindef(\testsynth,
-	\instrument, \sterOneShot,
-	\delta, 1/3,
-	\buf, Pseq([Pseq([~samples[\Synths][5]], 32),Pseq([~samples[\Synths][8]], 32)], inf),
-	\rate, Pseq((0.5!24) ++ (0.7!8), inf),
-	\start, 0,
-	\atk, 0,
-	\hold, 0,
-	\rel, 0.4,
-	\amp, 0.3,
-	\panX, Pseq([-1, 1, -1], inf),
-	\panY, Pseq([0, -1, 0, 1], inf)
-).play
-)
-
-
