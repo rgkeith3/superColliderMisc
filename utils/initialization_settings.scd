@@ -1,4 +1,4 @@
-// settings file
+ // settings file
 
 // quad
 (
@@ -24,11 +24,13 @@ s.options.numInputBusChannels_(~numChannels);
 s.options.memSize_(2.pow(20))
 )
 
+
 (
 // regular I/O
 s.options.memSize_(2.pow(20))
-)
+s
 
+)
 // load samples
 (
 var sampleFolder;
