@@ -5,6 +5,9 @@ s.options.numBuffers = 2.pow(14);
 
 s.options.memSize = 2.pow(20);
 
+s.options.outDevice_("JackRouter");
+s.options.inDevice_("JackRouter");
+
 // s.options.outDevice_("UMC404HD 192k");
 // s.options.inDevice_("UMC404HD 192k");
 n = 2;
@@ -24,7 +27,7 @@ a = currentEnvironment;
 f = (
 	// fills an array of \dur values that will sum to a given length
 	durFill: {
-		|numBeats = 8, minDiv=0.0625, density=0.5|
+		|numBeats = 8, minDiv=0.25, density=0.5|
 		var vals;
 		vals = [];
 		while({vals.sum < numBeats}, {
@@ -73,10 +76,18 @@ f = (
 		});
 		vals.postln;
 		vals;
+	},
+
+	// effects nodes
+
+	stDelay: {
+		|in, divL=4, divR=4, decL=1, decR=1|
+		var time = p.clock.tempo.reciprocal;
+		[CombN.ar(in[0], time, time / divL, decL), CombN.ar(in[1], time, time/ divR, decR)];
 	}
 );
 
-// helper lfo functions ex. { l[\sin].value(clock, 4, 100, 100)}
+// helper lfo functions ex. { l[\sin].value(clock, 4, 100, 1000)}
 l = (
 	sin: {
 		|clock=1, div=1, lo=(-1), hi=1|
@@ -192,6 +203,10 @@ d = ();
 	loadSynthDefs: {
 		("SynthDefs.scd").loadRelative;
 	},
+
+	createEvents: {
+		("Events.scd").loadRelative;
+	}
 );
 
 s.waitForBoot {
