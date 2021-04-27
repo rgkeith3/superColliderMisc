@@ -6,7 +6,7 @@
 
 ~a.stop
 
-~revSnd = ~a;
+~revSnd = ~b;
 (
 ~rev = {
 	|fb=0.8, comb_reset_spd = 5, comb_depth = 1, comb_mod_spd  = 0.1, smooth_depth = 0.5, smooth_mod_spd = 0.1, st_mix = 0.2|
@@ -42,15 +42,15 @@
 )
 
 ~rev.play
-~rev.set(\fb, 0);
+~rev.set(\fb, 1);
 
-~rev.set(\st_mix, 0.2);
+~rev.set(\st_mix, 0.5);
 
-~rev.set(\comb_mod_spd, 5);
+~rev.set(\comb_mod_spd, 1);
 ~rev.set(\comb_depth, 1);
-~rev.set(\smooth_mod_spd, 5);
+~rev.set(\smooth_mod_spd, 1);
 ~rev.set(\smooth_depth, 1);
-~rev.set(\comb_reset_spd, 50)
+~rev.set(\comb_reset_spd, 1)
 
 ~a.stop
 ~a.play

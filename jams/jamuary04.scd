@@ -1,14 +1,14 @@
-~a = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Kicks][10], \amp, Pseg([1, 0.1], 2, repeats: inf), \dur, Pbjorklund2(7, 12) / 4, \pan, Pseg([-1, 1, -1], 8, repeats: inf), \rel, 1)
+~a = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\k][10], \amp, Pseg([1, 0.1], 2, repeats: inf), \dur, Pbjorklund2(7, 12) / 4, \pan, Pseg([-1, 1, -1], 8, repeats: inf), \rel, 1)
 
 ~a[10] = \filterIn -> {|in| (CompanderD.ar(in * 2) * 2).softclip}
 
 ~a.play
 
-~b = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums]['Closed Hihat'][5], \amp, Pseq([1, 0.8], inf), \dur, Pwrand([Pseq([0.26, 0.24], 12), Pseq([1/6], 3)], [0.8, 0.2], inf), \pan, Pwhite(-0.5, 0.5))
+~b = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\ch][5], \amp, Pseq([1, 0.8], inf), \dur, Pwrand([Pseq([0.26, 0.24], 12), Pseq([1/6], 3)], [0.8, 0.2], inf), \pan, Pwhite(-0.5, 0.5))
 ~b.play
 ~b.stop(10)
 
-~c = Pbind(\instrument, \oneShot, \buf, Prand(d[\samples][\zaps][8..12], inf), #[\p,\amp,\rate], Plorenz(20, 48).trace * [1, 2, 2], \pan, Pkey(\p) * 2 -1, \atk, 0, \rel, 0.5, \dur, 1/4)
+~c = Pbind(\instrument, \oneShot, \buf, Prand(d[\samples][\zaps][8..12], inf), #[\p,\amp,\rate], Plorenz(20, 48) * [1, 2, 2], \pan, Pkey(\p) * 2 -1, \atk, 0, \rel, 0.5, \dur, 1/4)
 ~c.play(fadeTime: 10)
 
 
@@ -25,14 +25,14 @@
 ~c.play
 
 
-~d = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Snares][5], \dur, Pwrand([4, Pseq([1/2, 1/2, 3])], [0.7, 0.3], inf), \amp, 1)
+~d = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\s][5], \dur, Pwrand([4, Pseq([1/2, 1/2, 3])], [0.7, 0.3], inf), \amp, 1)
 ~d.play
 
 ~d[10] = \filter -> {|in, div=4, dec=1| var time = p.clock.tempo.reciprocal; CombC.ar(in, time, time/ div, dec)}
 
 ~d[15] = \set -> Pbind(\div, Prand([1, 2,3,4,5], inf), \dec, Prand([1, 5]), \dur, 4)
 
-~e = Pbind(\instrument, \saw, \degree, Psr(4, Scale.minor.degrees, 1), \dur, 8, \fFreq, 5000, \q, 0.1, \strum, 1, \rel, 1, \atk, 1, \scale, Scale.minor, \pan, [-1, 1, 0.3, -0.3])
+~e = Pbind(\instrument, \saw, \degree, Psr(4, [1,2,3,4,5,6,7,8], 1), \dur, 8, \fFreq, 5000, \q, 0.1, \strum, 1, \rel, 1, \atk, 1, \scale, Scale.minor, \pan, [-1, 1, 0.3, -0.3])
 ~e.play
 ~e.stop(10)
 

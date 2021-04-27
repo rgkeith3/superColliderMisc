@@ -1,16 +1,16 @@
-~a = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Kicks][8], \dur, Pseq(f[\durFillSize].value(16, 1/4, 0.45, 16), inf), \amp, 1, \pan, Pseq([Pseq([0], 12), Pseq([-1, 1, -1, 1])], inf))
+~a = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\k][8], \dur, Pseq(f[\durFillSize].value(16, 1/4, 0.45, 16), inf), \amp, 1, \pan, Pseq([Pseq([0], 12), Pseq([-1, 1, -1, 1])], inf))
 ~a.play
 
-~b = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums]['Closed Hihat'].choose, \dur, Pseq([0.26, 0.25], inf), \pan, Pbrown(-1), \amp, Pwhite(0.8))
+~b = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\ch].choose, \dur, Pseq([0.26, 0.25], inf), \pan, Pbrown(-1), \amp, Pwhite(0.8))
 ~b.play
 
-~c[0] = Ptpar([4, Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Claps][9], \dur, 8, \amp, 2)])
+~c[0] = Ptpar([4, Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\c][9], \dur, 8, \amp, 2)])
 
 ~c[10] = \filterIn -> {|in| FreeVerb.ar(in, 1, 1)}
 ~c.set(\wet10, 0.3)
 ~c.play
 
-~d[0] = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Snares][4], \dur, Pseq(f[\durFill].value(16, 1/4, 0.3), inf), \amp, Pwhite(0.5, 0.8))
+~d[0] = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\s][4], \dur, Pseq(f[\durFill].value(16, 1/4, 0.3), inf), \amp, Pwhite(0.5, 0.8))
 
 ~d[10] = \filterIn -> {|in, divL=4, divR=4, decL=1, decR=1| var time = p.clock.tempo.reciprocal; [CombN.ar(in[0], time, time/divL, decL), CombN.ar(in[1], time, time/divR, decR)]}
 ~d.set(\wet10, 0.2)

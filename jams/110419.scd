@@ -14,17 +14,17 @@ Pbindef(\a, \rel, 0.5, \amp, 0.5)
 
 ~a.set(\wet20, 0.2)
 ~a.set(\wet10, 0.3)
+~a.play
 
+~b[0] = Pbindef(\b, \instrument, \oneShot, \buf, d[\samples][\drums][\k][5], \dur, Pwrand([1, Pseq([3/4, 1/4])], [0.8, 0.2], inf), \rel, 1)
 
-~b[0] = Pbindef(\b, \instrument, \oneShot, \buf, d[\samples][\Drums][\Kicks][5], \dur, Pwrand([1, Pseq([3/4, 1/4])], [0.8, 0.2], inf), \rel, 1)
-
-Pbindef(\b, \buf, d[\samples][\Drums][\Kicks].choose)
+Pbindef(\b, \buf, d[\samples][\drums][\k].choose)
 Pbindef(\b, \dur, Pwrand([1, Pseq([3/4, 1/4])])
 
 ~b[10] = \filterIn -> {|in| CompanderD.ar((~b * 0.5), slopeBelow: 0.9)}
 ~b.play
 
-~c[0] = Pbindef(\c, \instrument, \oneShot, \buf, d[\samples][\Drums][\Claps].choose, \dur, Prand([8, Pseq([3/4, 3/4, 3/4, 23/4])], inf))
+~c[0] = Pbindef(\c, \instrument, \oneShot, \buf, d[\samples][\drums][\c].choose, \dur, Prand([8, Pseq([3/4, 3/4, 3/4, 23/4])], inf))
 Pbindef(\c, \amp, Pwhite(0.8))
 ~c.play
 

@@ -6,10 +6,10 @@
 ~a[30] = \filterIn -> {|in| Concat2.ar(~concatSrc.ar, in, matchlength: p.clock.tempo.reciprocal) }
 ~a[35] = \set -> Pbind(\wet30, Pwrand([0, 0.5], [0.8, 0.2], inf), \dur, 1/2)
 ~concatSrc = {WhiteNoise.ar(LFNoise0.kr(p.clock.tempo / 2))}
-~a.stop(20)
+~a.play
 
-~e = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums]['Closed Hihat'].choose, \amp, 1, \dur, Pseq([0.24, 0.26], inf))
-~e.stop(5)
+~e = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\ch].choose, \amp, 1, \dur, Pseq([0.24, 0.26], inf))
+~e.play
 
 
 
@@ -19,7 +19,7 @@ p.clock.tempo = 165/ 60
 
 ~b = Pbind(\instrument, \saw, \degree, Pseq([Pseq([1,3,5], 72), Pseq([2,6,8], 72)], inf), \scale, Scale.minorPentatonic, \dur, Pwrand([1/3, Pseq([1/6], 2)], [0.9, 0.1], inf), \pan, Pbrown(-1), \amp, 0.6, \cutoff, Pbrown(500, 5000, 10), \q, 0.2, \rel, Pbrown(0.01, 1))
 
-~b.stop(10)
+~b.play
 
 ~revSnd = ~c +~f;
 

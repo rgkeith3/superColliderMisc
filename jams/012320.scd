@@ -13,16 +13,16 @@
 ~a1.set(\buf, d[\samples][\lost].choose, \amp, 0.3, \pointer, ~n, \winSize, ~n, \pan, ~n)
 
 ~a1[10] = \filter -> {|in, disL=0, disR=0| Disintegrator.ar(in, [disL, disR])}
-
+~a1.spawn
 ~a1.scope
 
-~b = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums]['Closed Hihat'].choose, \dur, Pwrand([1, Pseq([1/2], 2), Pseq([1/3], 3), Pseq([1/4], 4)], [0.7, 0.1, 0.1, 0.1], inf))
+~b = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\ch].choose, \dur, Pwrand([1, Pseq([1/2], 2), Pseq([1/3], 3), Pseq([1/4], 4)], [0.7, 0.1, 0.1, 0.1], inf))
 ~b.play
 
-~c = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Claps][0], \dur, 8, \amp, 1)
+~c = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\c][0], \dur, 8, \amp, 1)
 ~c.play
 
-~d[0]= Ptpar([2, Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Kicks][8], \dur, Pseq(f[\durFill].value(8, 1/2, 0.3), inf), \amp, 1)])
+~d[0]= Ptpar([2, Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\k][8], \dur, Pseq(f[\durFill].value(8, 1/2, 0.3), inf), \amp, 1)])
 
 ~d[10] = \filter -> {|in| RLPF.ar(in, SinOsc.kr(0.12).range(150, 500), 0.5)}
 ~d.play
@@ -30,6 +30,7 @@
 ~e = \stLoop
 ~e.set(\buf, d[\stereo_samples][\texture][4], \spd, ~n)
 ~e.play
+~e.spawn
 
 ~n = {LFNoise1.kr(0.1).range(0, 2)}
 

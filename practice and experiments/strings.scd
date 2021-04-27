@@ -26,7 +26,7 @@ SynthDef(\bow, {
 }).add
 )
 
-
+p.pop
 (
 Pbindef(\bowCloud,
 	\instrument, \bow,
@@ -45,7 +45,7 @@ Pbindef(\bowCloud,
 	\vibStrength, 1,
 	\vibFreq, Prand([5, 3, 10], inf),
 	\degree, Pseq([1,4,5,7], inf),
-	\scale, Scale,
+	\scale, Scale.major,
 	\octave, 4
 ).play
 )
@@ -61,8 +61,7 @@ TempoClock.default.tempo_(2)
 (
 Pbindef(\bows,
 	\instrument, \bow,
-	\delta, Pwrand([1/6, 1/3, 1/2, 1, 2], [0.5, 0.2, 0.1, 0.1, 0.1], inf),
-	\dur, Pkey(\delta),
+	\dur, 1/8,
 	\atk, Pwhite(),
 	\dec, 0.1,
 	\sus, 0.7,

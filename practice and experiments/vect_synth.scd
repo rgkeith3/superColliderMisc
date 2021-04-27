@@ -1,5 +1,5 @@
 // would be cool to encorporate dopler effect in this. maybe make this ambisonic
-
+s.boot
 (
 SynthDef(\vect_synth, {
 	|freq=250, pitch_env=0.5, start_filt=20000, end_filt=10, filt_q=0.5, atk=1, hold=0, rel=1, clock=1, pan_start=0, pan_end=2, amp=1, out=0|
@@ -30,19 +30,19 @@ t = TempoClock.new(140/60)
 Pdef(\vectors,
 	Pbind(
 		\instrument, \vect_synth,
-		\delta, 1/3,
+		\delta, 1,
 		\clock, t.tempo,
 		\degree, Pdefn(\degree, 1),
 		\octave, 5,
-		\start_filt, 50,
-		\end_filt, 5000,
-		\filt_q, 0.5,
+		\start_filt, Pwhite(50, 5000),
+		\end_filt, Pwhite(50, 5000),
+		\filt_q, 0.1,
 		\pitch_env, 1,
-		\atk, 0,
-		\hold, Pwrand([0, 1], [0.9, 0.1], inf),
-		\rel, 0.3,
-		\pan_start, Pwhite(0.0, 2.0),
-		\pan_end, Pwhite(0.0, 2.0),
+		\atk, 1,
+		\hold, 1,
+		\rel,1,
+		\pan_start, 0,
+		\pan_end, Pseq([1, -1], inf),
 		\amp, 0.5
 	)
 ).play(t)

@@ -5,12 +5,15 @@ s.options.numBuffers = 2.pow(14);
 
 s.options.memSize = 2.pow(20);
 
+// s.options.outDevice_("HDMI");
+// s.options.sampleRate_(48000);
+s.options.sampleRate_(44100);
 s.options.outDevice_("JackRouter");
 s.options.inDevice_("JackRouter");
 
 // s.options.outDevice_("UMC404HD 192k");
 // s.options.inDevice_("UMC404HD 192k");
-n = 2;
+n=8;
 s.options.numOutputBusChannels_(n);
 s.options.numInputBusChannels_(n);
 
@@ -32,7 +35,7 @@ f = (
 		vals = [];
 		while({vals.sum < numBeats}, {
 			var nextNum, randAmt;
-			randAmt = rand(density.reciprocal.asInt) + 1;
+			randAmt = rand(density.reciprocal.asInteger) + 1;
 			nextNum = randAmt * minDiv;
 			if (vals.sum + nextNum > numBeats, {
 				vals = vals ++ (numBeats - vals.sum);
@@ -63,7 +66,7 @@ f = (
 		var vals = Array.fill(arrSize, {minDiv});
 		while({vals.sum < numBeats}, {
 			var nextNum, randAmt;
-			randAmt = rand(density.reciprocal.asInt) + 1;
+			randAmt = rand(density.reciprocal.asInteger) + 1;
 			nextNum = randAmt * minDiv;
 
 			if (vals.sum + nextNum > numBeats, {
@@ -127,7 +130,7 @@ d = ();
 
 // setupFuncs
 ~setupFuncs = (
-	loadBufs: { |folderName, numChannels =1|
+	loadBufs: { |folderName, numChannels =1, separate_channels=false|
 		var sampleFolder, recurseFolder, readFiles;
 		d.put(folderName, ());
 
@@ -138,7 +141,12 @@ d = ();
 			var fileArray = [];
 			files.do({
 				|file|
-				var buf = Buffer.readChannel(s, file.fullPath, channels: Array.series(numChannels));
+				var buf;
+				if (separate_channels) {
+					buf = (l: Buffer.readChannel(s, file.fullPath, channels: [0]), r: Buffer.readChannel(s, file.fullPath, channels: [1]));
+				} {
+					buf = Buffer.readChannel(s, file.fullPath, channels: Array.series(numChannels));
+				};
 				fileArray = fileArray ++ [buf];
 			});
 			fileArray;
@@ -206,6 +214,10 @@ d = ();
 
 	createEvents: {
 		("Events.scd").loadRelative;
+	},
+
+	startMidi: {
+		("Midi.scd").loadRelative;
 	}
 );
 
@@ -220,11 +232,16 @@ s.waitForBoot {
 Task({
 	3.wait;
 	a[\setupFuncs][\loadSynthDefs].value;
+	a[\setupFuncs][\createEvents].value;
+	// a[\setupFuncs][\startMidi].value;
 	a[\setupFuncs][\loadBufs].value(\samples);
-	a[\setupFuncs][\loadBufs].value(\stereo_samples, 2)
+	a[\setupFuncs][\loadBufs].value(\stereo_samples, 2);
+	a[\setupFuncs][\loadBufs].value(\ir, 2, true);
 }).start;
 
-StageLimiter.activate;
+StageLimiter.activate(n);
+
+// init proxyspace
 p = ProxySpace.push(s);
 
 p.makeTempoClock;

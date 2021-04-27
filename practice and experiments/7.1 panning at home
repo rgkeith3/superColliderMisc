@@ -1,0 +1,10 @@
+(~a = {
+	var sig, chan1, chan2, chan3, chan4, chan5, chan6, chan7;
+	sig = Saw.ar(50);
+	[sig, PanAz.ar(7, sig, SawDPW.ar(1, mul: 2), width: 3)].flatten;
+})
+
+~a[10] = \filter -> {|in| [in[7], in[2], in[1], in[0], in[6], in[3], in[5], in[4]]}
+~a.play
+
+~a.scope

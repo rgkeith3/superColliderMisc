@@ -34,7 +34,7 @@ StageLimiter.activate
 ~a.play(fadeTime: 5)
 ~verbSend.stop
 ~verbSend = ~a * 0.3
-~c = {NHHall.ar([~verbSend.ar()[0], ~verbSend.ar()[1]], ~lfo3)}
+~c = {NHHall.ar(~verbSend.ar(), ~lfo3)}
 ~c = {FreeVerb.ar(~verbSend, 1, 1)}
 ~a.fadeTime = 0
 ~c.play(fadeTime: 10)

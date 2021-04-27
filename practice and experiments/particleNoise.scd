@@ -3,7 +3,7 @@ s.boot
 
 ({
 	var trig = Ringz.ar(K2A.ar(1), MouseY.kr(0, 1000), MouseX.kr);
-	// [CombC.ar(trig, 0.1, LFNoise2.kr(1, 0.05, 0.05)), CombC.ar(trig, 0.1, LFNoise2.kr(1.2, 0.05, 0.05))]
+	[CombC.ar(trig, 0.1, LFNoise2.kr(1, 0.05, 0.05)), CombC.ar(trig, 0.1, LFNoise2.kr(1.2, 0.05, 0.05))]
 	trig!2
 }.play)
 
@@ -21,7 +21,8 @@ SynthDef.new(\particleNoise, {
 Pbindef(\particleNoise,
 	\instrument, \particleNoise,
 	\delta, Pwhite(0.01, 0.1),
-	\freq, Pwhite(500, 5000),
-	\dec, Pwhite(0.01, 0.5)
+	\freq, Pwhite(50, 5000),
+	\dec, Pwhite(0.01, 2),
+	\amp, Pwhite()
 ).play
 )

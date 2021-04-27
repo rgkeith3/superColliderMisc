@@ -31,7 +31,7 @@ Pbindef(\eights,
 	\rel, 0.5,
 	\amp, 1,
 	\dur, Pseq([1, 1, 2/3, 1/3, 3/4, 1/4], inf)
-)
+).play
 )
 
 (

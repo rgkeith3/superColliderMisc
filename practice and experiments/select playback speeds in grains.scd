@@ -1,5 +1,5 @@
 ~a[0] = {GrainBuf.ar(2, Dust.kr(LFNoise1.kr(0.3).range(0, 100)), LFNoise1.kr(0.2).range(0, 1), Select.kr(LFNoise1.kr(0.1).range(0, 16) + WhiteNoise.kr(LFNoise1.kr(0.3).range(0, 8)), d[\samples][\kitchen]), Select.kr(WhiteNoise.kr(LFNoise1.kr(0.1).range(0, 1)).range(0, 8), [0.25, 0.5, 1, 1.25, 4/3, 1.5, 2]), LFNoise1.kr(0.1).range(0, 1), pan: LFNoise1.kr(0.2) + WhiteNoise.kr(LFNoise1.kr(0.1).range(0, 1)), envbufnum: e[\perc]) * 0.2}
-~a[20] = {Decimator.ar(SinOsc.ar([50, 50.1]), LFNoise1.kr(0.4).range(1, 20000), LFNoise1.kr(0.6).range(1, 24)) * 0.2}
+~a[20] = {Decimator.ar(SinOsc.ar(LFNoise1.kr([0.01, 0.05]).range(50, 51)), LFNoise1.kr(0.4).range(1, 20000), LFNoise1.kr(0.6).range(1, 24)) * SinOsc.kr(4, mul: LFNoise1.kr([0.2, 0.21]).range(0, 1))}
 
 ~a.play(fadeTime: 10)
 5/4

@@ -1,11 +1,11 @@
 (
 // n is numChannels
 var nPanFunc, outFunc, adsrFunc, percFunc, synthDefs;
-if (n == 2) {
-	nPanFunc = {|sig, pan=0| Pan2.ar(sig, pan)};
-} {
-	nPanFunc = {|sig, panX=0, panY=0| Pan4.ar(sig, panX, panY)};
-};
+switch (n,
+	2, nPanFunc = {|sig, pan=0| Pan2.ar(sig, pan)},
+	4, nPanFunc = {|sig, panX=0, panY=0| Pan4.ar(sig, panX, panY)},
+	nPanFunc = {|sig, pan=0, width=2| PanAz.ar(n-1, sig, pan, level: width)}
+);
 
 outFunc = {|sig, out=0, amp=0.8| Out.ar(out, sig * amp)};
 
@@ -96,9 +96,9 @@ synthDefs = (
 	],
 
 	flutterSaw: [
-		{|freq=440, amt=1, rate=15, cutoff=880, q=1|
+		{|freq=440, amt=1, rate=15, filter_freq=880, q=1|
 			var flutter = LFClipNoise.kr(rate, amt/2, amt/2) * freq;
-			RLPF.ar(SawDPW.ar(freq + flutter), cutoff, q);
+			RLPF.ar(SawDPW.ar(freq + flutter), filter_freq, q);
 		},
 		adsrFunc,
 		nPanFunc,
@@ -158,6 +158,7 @@ synthDefs = (
 		nPanFunc,
 		outFunc
 	],
+	// need to change the 'dec' arg here doesn't seem to work
 	pluck: [
 		{|freq=440, pAmt=1, pTime=0.1, dec=1, timbre=0.5|
 			var pEnv, startP, endP, sig;
@@ -178,6 +179,14 @@ synthDefs = (
 			Balance2.ar(sig[0], sig[1], pan);
 		},
 		adsrFunc,
+		outFunc
+	],
+	sinDrop: [
+		{|freq=440, fb=0.1, dropDur=1, dropAmt=0.1|
+			SinOscFB.ar(Line.ar(freq, freq * dropAmt, dropDur), fb);
+		},
+		percFunc,
+		nPanFunc,
 		outFunc
 	]
 

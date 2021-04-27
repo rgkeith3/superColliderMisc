@@ -6,7 +6,7 @@
 
 ~a.play
 
-~b = Pbind(\instrument, \noizSpr, \dur, Pseq(f[\durFill].value(64, 4), inf), \octave, 3, \tilt, Pwhite(), \amp, 0.5, \degree, Pseq([1, 1, 1, 3, 1, 2, 3, 5],inf), \scale, Scale.minorPentatonic, \sprTm, 8, \cutoff, Pwrand([500, 5000], [0.8, 0.2],inf), \res, 0.8)
+~b = Pbind(\instrument, \noizSpr, \dur, Pseq(f[\durFill].value(64, 4), inf), \octave, 2, \tilt, Pwhite(), \amp, 0.5, \degree, Pseq([1, 1, 1, 3, 1, 2, 3, 5],inf), \scale, Scale.minorPentatonic, \sprTm, 8, \cutoff, Pwrand([500, 5000], [0.8, 0.2],inf), \res, 0.8)
 
 ~b.play
 
@@ -18,14 +18,14 @@
 ~rev = {NHHall.ar(~revSnd.ar)}
 ~rev.play(fadeTime: 10)
 
-~d = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Kicks].choose, \amp, 1)
+~d = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\k].choose, \amp, 1)
 ~d.play
 
-~e = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums][\Snares][7], \amp, 1, \dur, Pbjorklund2(4, 10))
+~e = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\s].choose, \amp, 1, \dur, Pbjorklund2(4, 10))
 
 ~e.play
 
-~f = Pbind(\instrument, \oneShot, \buf, d[\samples][\Drums]['Closed Hihat'].choose, \amp, Pwhite(0.8), \dur, Pseq([0.26, 0.24], inf))
+~f = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\ch].choose, \amp, Pwhite(0.8), \dur, Pseq([0.26, 0.24], inf))
 
 ~f.play
 
