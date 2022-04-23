@@ -25,9 +25,22 @@
 
 ~a[0] = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\k][5], \amp, 1, \pan, Pwhite(-1), \dur, Pseq(f[\durFill].value(), inf))
 
-~a[0] = Pbind(\instrument, \flutterSaw, \pan, Pbrown(-1), \amt, Pwrand([0.01, 1, 2], [0.5, 0.25, 0.25],inf), \rate, 5, \q, 0.1, \filter_freq, Pbrown(500, 5000, 100), \degree, Pdefn(\deg, Prand([1,3,5,7,9,11], inf)), \octave, Pwrand([3,4,5,6], [0.1, 0.1, 0.6, 0.2], inf), \dur, Pseq(f[\durFill].value(), inf), \rel, Pwrand([0.1, 1, 3, 5], [0.3, 0.3, 0.2, 0.2], inf))
+(~a[0] = Pbind(
+	\instrument, \flutterSaw,
+	\pan, Pbrown(-1),
+	\amt, Pwrand([0.01, 1, 2], [0.5, 0.25, 0.25],inf),
+	\rate, 5,
+	\q, 0.1,
+	\amp, Pbrown(0, 0.5),
+	\filter_freq, Pbrown(1000, 10000, 200),
+	\degree, Pseq(f[\valFill].value(16, (1..12)), inf),
+	\octave, Pseq(f[\valFill].value(12, (3..6)), inf),
+	\dur, Pseq(f[\durFill].value(16), inf),
+	\rel, 0.1,
+	// \rel, Pwrand([0.1, 1, 3], [0.5, 0.3, 0.2], inf))
+)
 
-~a[0] = Pbind(\instrument, \pluck, \degree, Pdefn(\deg), \pAmt, 0,  \dec, Pwrand([0.1, 1, 3], [0.2, 0.6, 0.2], inf), \timbre, Pbrown(step: 0.0125), \pan, Pwhite(-1), \dur, Pwhite(0.05, 0.2), \octave, Prand([3,4,5,6],inf), \amp, Pwhite(0.5))
+~a[0] = Pbind(\instrument, \pluck, \degree, Pdefn(\deg), \pAmt, 0.01,  \dec, Pwrand([0.1, 1, 3], [0.2, 0.6, 0.2], inf), \timbre, Pbrown(step: 0.125), \pan, Pwhite(-1), \dur, Pwhite(0.05, 0.2), \octave, Prand([3,4,5,6],inf), \amp, Pwhite(0.5))
 
 Pdefn(\deg, Prand([1,3,5,7,9,11], inf))
 [1,2,3][0..1]
@@ -47,15 +60,17 @@ d[\samples].keys
 
 ~b = {GrainBuf.ar(7, Dust.kr(5), sndbuf: LFNoise1.kr(1).range(d[\samples][\vox].first.bufnum, d[\samples][\vox].last.bufnum), pos: WhiteNoise.ar().range(0,1), pan: WhiteNoise.ar())}
 
-~b = {PanAz.ar(7, Warp1.ar(1, LFNoise1.kr(0.1).range(d[\samples][\vox].first.bufnum, d[\samples][\vox].last.bufnum), LFNoise1.kr(0.1).range(0,1), overlaps: 8, windowRandRatio: LFNoise1.kr(0.1).range(0,0.1)), LFNoise1.kr(0.1))}
+~b[0] = {PanAz.ar(7, Warp1.ar(1, LFNoise1.kr(0.1).range(d[\samples][\vox].first.bufnum, d[\samples][\vox].last.bufnum), LFNoise1.kr(0.1).range(0,1), overlaps: 8, windowRandRatio: LFNoise1.kr(0.1).range(0,0.1)), LFNoise1.kr(0.1))}
 ~b.scope
 
 ~b[1] = \filter -> {|in| [in[6], in[1], in[0], Mix(in), in[5], in[2], in[4], in[3]]}
 ~b.play
 
-~c = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\k][16], \pan, Pwhite(-1), \dur, Pseq([1/4, 1/4, 1/4, 1/4, 3, 3, 1/3, 1/3, 1/3], inf), \amp, 1, \spd, 1)
+~c[0] = Pbind(\instrument, \oneShot, \buf, d[\samples][\drums][\k][16], \pan, Pbrown(-1, step: 0.2), \dur, Pseq([1/4, 1/4, 1/4, 1/4, 3, 3, 1/3, 1/3, 1/3], inf), \amp, 1, \spd, 1)
+~c[1] = \filter -> {|in| [in[6], in[1], in[0], Mix(in) * 0.5, in[5], in[2], in[4], in[3]]}
 ~c[10] = \filter -> {|in| in.softclip}
 ~c.play
+~c.stop
 ~a.stop
 ~c.mold(8)
 
@@ -65,12 +80,10 @@ d[\samples].keys
 ~d.mold(8)
 d[\samples][\drums][\k]
 
-~c[1] = \filter -> {|in| [in[6], in[1], in[0], Mix(in), in[5], in[2], in[4], in[3]]}
-
 ~b.mold(8)
 ~a.mold(8)
 
 ~b.play
 ~revSnd = ~b + ~d
 ~rev = {FreeVerb.ar(~revSnd.ar, 1, 1)}
-~rev.play
+~rev.stop

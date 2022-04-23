@@ -13,7 +13,7 @@ s.options.inDevice_("JackRouter");
 
 // s.options.outDevice_("UMC404HD 192k");
 // s.options.inDevice_("UMC404HD 192k");
-n=8;
+n=2;
 s.options.numOutputBusChannels_(n);
 s.options.numInputBusChannels_(n);
 
@@ -79,6 +79,22 @@ f = (
 		});
 		vals.postln;
 		vals;
+	},
+
+	// for hdmi 7_1
+	azToHDMI: {|in|
+		var c, r_f, r_s, r_rs, l_rs, l_s, l_f, sw;
+
+		c = in[0];
+		r_f = in[1];
+		r_s = in[2];
+		r_rs = in[3];
+		l_rs = in[4];
+		l_s = in[5];
+		l_f = in[6];
+		sw = Mix(in);
+
+		[l_f, r_f, c, sw, l_s, r_s, l_rs, r_rs];
 	},
 
 	// effects nodes
@@ -236,7 +252,13 @@ Task({
 	// a[\setupFuncs][\startMidi].value;
 	a[\setupFuncs][\loadBufs].value(\samples);
 	a[\setupFuncs][\loadBufs].value(\stereo_samples, 2);
-	a[\setupFuncs][\loadBufs].value(\ir, 2, true);
+	// a[\setupFuncs][\loadBufs].value(\ir, 2, true);
+	// need to write a function specifically for setting up IR's for use in PartConv. see 'convolution_reverb_isnt_that_hard'
+	// instead of loading the buffers like normal, it'll
+	// load buffers
+	// calc partconv stuff
+	// create 'spectrum buffers'
+	// free regular buffers (optional depending on how much space / buffers we want to save)
 }).start;
 
 StageLimiter.activate(n);
@@ -247,4 +269,5 @@ p = ProxySpace.push(s);
 p.makeTempoClock;
 p.clock.tempo = 2;
 p.quant = 4;
+Pdefn.defaultQuant = 4;
 )
