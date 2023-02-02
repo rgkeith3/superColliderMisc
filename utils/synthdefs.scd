@@ -1,6 +1,7 @@
 (
 // n is numChannels
 var nPanFunc, outFunc, adsrFunc, percFunc, synthDefs;
+n.postln;
 switch (n,
 	2, nPanFunc = {|sig, pan=0| Pan2.ar(sig, pan)},
 	4, nPanFunc = {|sig, panX=0, panY=0| Pan4.ar(sig, panX, panY)},
